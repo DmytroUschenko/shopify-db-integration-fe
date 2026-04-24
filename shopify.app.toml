@@ -1,0 +1,24 @@
+name = "db-integration"
+client_id = "131c82f34f0fee1c96e06e646e485865"  # Fill in from Partners dashboard after creating the app
+
+# For local dev with ngrok, run:  make dev-ngrok  (set NGROK_URL in .env first)
+# The CLI will override this URL automatically; it is updated to reflect the current tunnel.
+application_url = "https://isocratic-gauntly-deane.ngrok-free.dev"
+embedded = true
+
+[access_scopes]
+# Managed by the `scopes` field in shopify.server.ts / .env SCOPES
+scopes = "write_products,read_orders,read_order_edits,read_customer_events,read_customers,read_customer_merge,read_customer_data_erasure"
+
+[auth]
+redirect_urls = [
+  "https://isocratic-gauntly-deane.ngrok-free.dev/auth/callback",
+  "https://isocratic-gauntly-deane.ngrok-free.dev/auth/shopify/callback",
+  "https://isocratic-gauntly-deane.ngrok-free.dev/shopify/auth/callback",
+]
+
+[webhooks]
+api_version = "2024-01"
+
+[pos]
+embedded = false

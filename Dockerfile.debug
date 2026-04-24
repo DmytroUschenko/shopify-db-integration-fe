@@ -1,0 +1,22 @@
+# Debug stage — mounts source as volume, enables Node.js inspector
+FROM node:20-alpine
+WORKDIR /app
+
+RUN apk add --no-cache openssl
+
+# Install dependencies first (cached layer)
+COPY package*.json ./
+RUN npm install
+
+# Source code is mounted via volume in docker-compose.debug.yml
+# so we only need to copy here for standalone `docker build` use cases
+COPY . .
+
+# Expose app port and Node.js debugger port
+EXPOSE 3000 9229
+
+# Generate Prisma client, do an initial Remix build, then start with inspector.
+# --watch (Node 20 built-in) automatically restarts the process when any
+# imported file changes — so running `npm run build:watch` on the host is all
+# that is needed to get a live-reload loop without restarting the container.
+CMD ["sh", "-c", "./node_modules/.bin/prisma generate && ./node_modules/.bin/prisma migrate deploy && npm run build && node --watch --inspect=0.0.0.0:9229 server.js"]
