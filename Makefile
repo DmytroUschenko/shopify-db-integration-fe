@@ -84,7 +84,9 @@ test:
 
 deploy-prod:
 	@echo "→ Pulling latest code..."
-	git pull
+	git fetch origin main
+	git reset --hard origin/main
+	git clean -fd
 	@echo "→ Stopping all prod containers..."
 	$(PROD_COMPOSE) down --remove-orphans
 	@echo "→ Cleaning build artifacts and npm cache..."
