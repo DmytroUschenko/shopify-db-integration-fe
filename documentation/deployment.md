@@ -139,7 +139,7 @@ cp .env.example .env
 ```
 
 Fill in `SHOPIFY_API_KEY`, `SHOPIFY_API_SECRET`, and `NGROK_URL`.
-Leave `APP_URL` as `http://localhost:3000` for now — update it after the first
+Leave `APP_URL` as `http://localhost:3005` for now — update it after the first
 tunnel is established.
 
 ### 3. Start ngrok
@@ -147,7 +147,7 @@ tunnel is established.
 In a separate terminal:
 
 ```bash
-ngrok http 3000
+ngrok http 3005
 ```
 
 Copy the `https://` URL (e.g. `https://abc123.ngrok-free.app`) and set it as
@@ -247,7 +247,7 @@ server {
     server_name app.yourdomain.com;
 
     location / {
-        proxy_pass http://127.0.0.1:3000;
+        proxy_pass http://127.0.0.1:3005;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -287,7 +287,7 @@ make deploy-prod
 docker compose --env-file .env up -d postgres
         ↓
 source .env
-NODE_OPTIONS="--inspect=0.0.0.0:9229" shopify app dev --config shopify.app.toml --tunnel-url "$NGROK_URL:3000"
+NODE_OPTIONS="--inspect=0.0.0.0:9229" shopify app dev --config shopify.app.toml --tunnel-url "$NGROK_URL:3005"
 ```
 
 `shopify app dev` does the following internally:
@@ -385,7 +385,7 @@ Get a new token from Partners dashboard → Settings → Partner API clients.
 
 **`NGROK_URL is not set` error**
 → Set `NGROK_URL` in `.env` before running `make deploy-local`.
-Start ngrok (`ngrok http 3000`), copy the `https://` URL, and paste it in.
+Start ngrok (`ngrok http 3005`), copy the `https://` URL, and paste it in.
 
 **`docker compose` uses wrong env values**
 → Make sure `.env.prod` (or `.env`) is present in the project root on the
@@ -401,5 +401,5 @@ network. If using the Compose postgres service, the hostname must be `postgres`
 your Partners dashboard. Confirm under Partners dashboard → Apps → your app →
 Client credentials.
 
-**Port 3000 already in use**
+**Port 3005 already in use**
 → Stop any existing containers: `docker compose down` then re-run.

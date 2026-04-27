@@ -15,7 +15,7 @@ The frontend is a Remix/Express application. Two Docker setups exist:
 
 | Port | Service |
 |---|---|
-| `3000` | Remix/Express HTTP server |
+| `3005` | Remix/Express HTTP server |
 | `9229` | Node.js inspector (local dev only) |
 | `5433` | PostgreSQL (host-mapped) |
 
@@ -108,7 +108,7 @@ Copy `.env.example` to `.env` and fill in values before starting:
 ```
 SHOPIFY_API_KEY=
 SHOPIFY_API_SECRET=
-APP_URL=http://localhost:3000
+APP_URL=http://localhost:3005
 BACKEND_URL=http://localhost:3001
 BACKEND_API_KEY=
 ```
@@ -122,7 +122,7 @@ BACKEND_API_KEY=
 Shopify webhooks require a public HTTPS URL. Use ngrok or the Shopify CLI tunnel:
 
 ```bash
-ngrok http 3000
+ngrok http 3005
 ```
 
 Then set `NGROK_URL` and `APP_URL` in `.env` and run:
