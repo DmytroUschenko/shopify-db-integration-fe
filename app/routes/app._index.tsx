@@ -10,7 +10,7 @@ export default function Index() {
   return (
     <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
       <h1>👋 Hello World!</h1>
-      <p>Your Shopify DB Integration app is working.</p>
+      <p>Welcome in Your Shopify app.</p>
     </div>
   );
 }
