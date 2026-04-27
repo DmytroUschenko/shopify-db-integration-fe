@@ -11,7 +11,7 @@ LOCAL_COMPOSE = docker compose -f docker-compose.debug.yml --env-file .env
 
 .PHONY: help \
         build watch test \
-        deploy-prod prod-stop prod-start prod-restart prod-logs prod-shell prod-db-changes prod-clean \
+        deploy-prod shopify-config-push prod-stop prod-start prod-restart prod-logs prod-shell prod-db-changes prod-clean \
         deploy-local local-stop local-start local-restart local-logs local-log-clean local-shell local-db-changes local-clean \
         clean
 
@@ -27,7 +27,8 @@ help:
 	@echo "  make test               Run Vitest unit tests"
 	@echo ""
 	@echo "Production (uses docker-compose.yml + .env.prod):"
-	@echo "  make deploy-prod        git pull → rebuild containers → apply DB changes → shopify deploy"
+	@echo "  make deploy-prod        git pull → rebuild containers → apply DB changes"
+	@echo "  make shopify-config-push Push app config to Partners Dashboard (needs SHOPIFY_CLI_PARTNERS_TOKEN)"
 	@echo "  make prod-stop          Stop prod containers (keep them)"
 	@echo "  make prod-start         Start stopped prod containers"
 	@echo "  make prod-restart       Restart prod containers (no rebuild)"
@@ -71,11 +72,15 @@ test:
 # PRODUCTION
 # ════════════════════════════════════════════════════════════
 # Run ON THE SERVER: ssh user@host, cd /project, make deploy-prod
-# Uses docker-compose.yml + .env.prod + shopify.app.prod.toml
+# Uses docker-compose.yml + .env.prod
 # Requires:
 #   - .env.prod on server (not in git)
-#   - SHOPIFY_CLI_PARTNERS_TOKEN in .env.prod for non-interactive auth
 #   - client_id in shopify.app.prod.toml
+#
+# NOTE: App URL, scopes, and redirect URLs are managed directly
+#   in the Shopify Partners Dashboard (no SHOPIFY_CLI_PARTNERS_TOKEN needed).
+#   If you do have a Partners token and want to push config via CLI, run:
+#     make shopify-config-push
 
 deploy-prod:
 	@echo "→ Pulling latest code..."
@@ -89,10 +94,13 @@ deploy-prod:
 	npm install
 	@echo "→ Rebuilding and starting prod containers..."
 	$(PROD_COMPOSE) up -d --build
-	@echo "→ Pushing Shopify app config to Partners dashboard..."
-	set -a && . ./.env.prod && set +a && \
-	  shopify app deploy --config shopify.app.prod.toml --force
 	@echo "→ Production deployed"
+
+# Optional: push app config (URLs, scopes) to Shopify Partners Dashboard via CLI.
+# Requires SHOPIFY_CLI_PARTNERS_TOKEN in .env.prod.
+shopify-config-push:
+	set -a && . ./.env.prod && set +a && \
+	  shopify app deploy --config shopify.app.prod.toml --allow-updates
 
 prod-stop:
 	$(PROD_COMPOSE) stop
