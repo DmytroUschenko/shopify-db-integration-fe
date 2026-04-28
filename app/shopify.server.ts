@@ -1,3 +1,4 @@
+import * as crypto from "node:crypto";
 import { shopifyApp } from "@shopify/shopify-app-remix/server";
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import { prisma } from "./db.server";
@@ -37,17 +38,22 @@ export const shopify = shopifyApp({
 
       // 2. Notify backend of new/returning shop
       try {
+        const bodyString = JSON.stringify({
+          shopDomain: session.shop,
+          accessToken: session.accessToken,
+          scope: session.scope,
+        });
+        const hmac = crypto
+          .createHmac("sha256", process.env.SHOPIFY_API_SECRET!)
+          .update(bodyString, "utf8")
+          .digest("base64");
         const response = await fetch(`${process.env.BACKEND_URL}/shops`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.BACKEND_API_KEY}`,
+            "x-request-hmac": hmac,
           },
-          body: JSON.stringify({
-            shopDomain: session.shop,
-            accessToken: session.accessToken,
-            scope: session.scope,
-          }),
+          body: bodyString,
         });
         if (!response.ok) {
           console.error(
